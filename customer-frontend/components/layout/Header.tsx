@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
-import { Menu, X, Waves } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -18,24 +18,23 @@ export default function Header() {
   const { isSignedIn } = useUser();
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  useEffect(() => { setOpen(false); }, [pathname]);
 
   return (
     <header className="sticky top-0 z-50 bg-[#0f2a47] text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <Waves className="w-6 h-6 text-[#c9a84c]" />
-            <span className="font-bold text-lg leading-tight">
-              Pompano Beach <span className="text-[#c9a84c]">Pointe</span>
-            </span>
+          <Link href="/" className="shrink-0">
+            <img
+              src="/logo.png"
+              alt="Pompano Beach Pointe Residences"
+              className="h-10 w-auto brightness-0 invert"
+            />
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-8">
             {NAV.map((item) => (
               <Link
                 key={item.href}
@@ -51,7 +50,7 @@ export default function Header() {
           </nav>
 
           {/* Auth — desktop */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             {isSignedIn ? (
               <>
                 <Link
@@ -78,7 +77,7 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile hamburger */}
           <button
             type="button"
             onClick={() => setOpen((prev) => !prev)}
@@ -130,7 +129,7 @@ export default function Header() {
         </div>
       )}
 
-      {/* Backdrop — closes menu when tapping outside on mobile */}
+      {/* Backdrop — closes menu on outside tap */}
       {open && (
         <div
           className="md:hidden fixed inset-0 top-16 z-40"

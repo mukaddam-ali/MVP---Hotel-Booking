@@ -1,6 +1,7 @@
-const API = process.env.NEXT_PUBLIC_API_URL!;
+const API = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 async function request<T>(path: string, options?: RequestInit, token?: string): Promise<T> {
+  if (!API) throw new Error('NEXT_PUBLIC_API_URL is not set');
   const headers: HeadersInit = { 'Content-Type': 'application/json', ...options?.headers };
   if (token) (headers as any)['Authorization'] = `Bearer ${token}`;
   const res = await fetch(`${API}${path}`, { ...options, headers });

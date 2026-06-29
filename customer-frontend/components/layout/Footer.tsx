@@ -1,35 +1,46 @@
 import Link from 'next/link';
-import { Waves, MapPin, Phone, Mail } from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0f2a47] text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+    <footer className="bg-[#0a2039] text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+
           {/* Brand */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Waves className="w-6 h-6 text-[#c9a84c]" />
-              <span className="font-bold text-lg">
-                Pompano Beach <span className="text-[#c9a84c]">Pointe</span>
-              </span>
+          <div className="md:col-span-2">
+            <div className="mb-4">
+              <img
+                src="/logo.png"
+                alt="Pompano Beach Pointe Residences"
+                className="h-12 w-auto brightness-0 invert"
+              />
             </div>
-            <p className="text-white/60 text-sm leading-relaxed">
-              Your home away from home in Pompano Beach, Florida. Book directly and save on fees.
+            <p className="text-white/50 text-sm leading-relaxed max-w-xs mb-6">
+              Fully furnished apartments for extended stays, business travel &amp; vacations
+              in Pompano Beach, Florida. Book direct and skip the fees.
             </p>
+            <div className="flex items-center gap-4">
+              <a href="https://www.facebook.com/pompanobeachpointe" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#c9a84c] text-xs font-medium transition-colors tracking-wide uppercase">
+                Facebook
+              </a>
+              <a href="https://www.instagram.com/pompanobeachpointe" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#c9a84c] text-xs font-medium transition-colors tracking-wide uppercase">
+                Instagram
+              </a>
+            </div>
           </div>
 
-          {/* Quick links */}
+          {/* Explore */}
           <div>
-            <h3 className="font-semibold text-[#c9a84c] mb-4 text-sm uppercase tracking-wider">Explore</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xs font-semibold text-[#c9a84c] uppercase tracking-[0.2em] mb-5">Explore</h3>
+            <ul className="space-y-3">
               {[
                 { label: 'Browse All Units', href: '/units' },
-                { label: 'Gallery', href: '/gallery' },
-                { label: 'My Bookings', href: '/my-bookings' },
+                { label: 'Gallery',          href: '/gallery' },
+                { label: 'My Bookings',      href: '/my-bookings' },
               ].map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-white/60 hover:text-white text-sm transition-colors">
+                  <Link href={l.href} className="text-white/50 hover:text-white text-sm transition-colors">
                     {l.label}
                   </Link>
                 </li>
@@ -39,30 +50,34 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold text-[#c9a84c] mb-4 text-sm uppercase tracking-wider">Contact</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-2 text-sm text-white/60">
+            <h3 className="text-xs font-semibold text-[#c9a84c] uppercase tracking-[0.2em] mb-5">Contact</h3>
+            <ul className="space-y-4">
+              <li className="flex items-start gap-2.5 text-sm text-white/50">
                 <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-[#c9a84c]" />
-                Pompano Beach, Florida
+                <span>
+                  2250 SE 5th St &amp; 25 NE 19th Ave<br />
+                  Pompano Beach, FL
+                </span>
               </li>
-              <li className="flex items-center gap-2 text-sm text-white/60">
-                <Phone className="w-4 h-4 text-[#c9a84c]" />
-                <a href="tel:+1-555-000-0000" className="hover:text-white transition-colors">
-                  (555) 000-0000
+              <li className="flex items-center gap-2.5 text-sm">
+                <Phone className="w-4 h-4 shrink-0 text-[#c9a84c]" />
+                <a href="tel:+19543209267" className="text-white/50 hover:text-white transition-colors">
+                  (954) 320-9267
                 </a>
               </li>
-              <li className="flex items-center gap-2 text-sm text-white/60">
-                <Mail className="w-4 h-4 text-[#c9a84c]" />
-                <a href="mailto:hello@pbpointe.com" className="hover:text-white transition-colors">
-                  hello@pbpointe.com
+              <li className="flex items-center gap-2.5 text-sm">
+                <Mail className="w-4 h-4 shrink-0 text-[#c9a84c]" />
+                <a href="mailto:info@StayPBPointe.com" className="text-white/50 hover:text-white transition-colors">
+                  info@StayPBPointe.com
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-10 pt-8 border-t border-white/10 text-center text-white/40 text-xs">
-          © {new Date().getFullYear()} Pompano Beach Pointe Residences. All rights reserved.
+        <div className="border-t border-white/8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-white/30 text-xs">
+          <span>© {new Date().getFullYear()} Pompano Beach Pointe Residences. All rights reserved.</span>
+          <span>Book direct · No platform fees · Pompano Beach, FL</span>
         </div>
       </div>
     </footer>
