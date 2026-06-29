@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── User ────────────────────────────────────────────────────────────────────
+
+model User {
+  id        String    @id          // Clerk userId — NOT a generated UUID
+  name      String
+  email     String    @unique
+  role      Role      @default(GUEST)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  bookings  Booking[]
+  reviews   Review[]
+}
+
+enum Role {
+  GUEST
+  ADMIN
+}
+
+// ─── Unit ────────────────────────────────────────────────────────────────────
+
+model Unit {
+  id            String         @id @default(uuid())
+  slug          String         @unique
+  name          String
+  type          String
+  pricePerNight Decimal        @db.Decimal(10, 2)
+  cleaningFee   Decimal        @default(0) @db.Decimal(10, 2)
+  maxGuests     Int
+  bedrooms      String
+  bathrooms     String
+  sqft          String
+  description   String[]
+  images        String[]
+  amenities     String[]
+  status        UnitStatus     @default(AVAILABLE)
+  icalUrl       String?
+  icalLastSync  DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  bookings      Booking[]
+  blockedDates  BlockedDate[]
+  reviews       Review[]
+  galleryImages GalleryImage[]
+}
+
+enum UnitStatus {
+  AVAILABLE
+  UNAVAILABLE
+  MAINTENANCE
+}
+
+// ─── Booking ─────────────────────────────────────────────────────────────────
+
+model Booking {
+  id          String        @id @default(uuid())
+  user        User          @relation(fields: [userId], references: [id])
+  userId      String
+  unit        Unit          @relation(fields: [unitId], references: [id])
+  unitId      String
+  checkin     DateTime
+  checkout    DateTime
+  guests      Int
+  totalPrice  Decimal       @db.Decimal(10, 2)
+  status      BookingStatus @default(PENDING)
+  reviewed    Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  payment     Payment?
+  review      Review?
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+// ─── BlockedDate ─────────────────────────────────────────────────────────────
+
+model BlockedDate {
+  id        String      @id @default(uuid())
+  unit      Unit        @relation(fields: [unitId], references: [id])
+  unitId    String
+  date      DateTime
+  source    BlockSource @default(BOOKING)
+  bookingId String?
+  note      String?
+  createdAt DateTime    @default(now())
+
+  @@unique([unitId, date])
+  @@index([unitId, date])
+}
+
+enum BlockSource {
+  BOOKING
+  ICAL
+  MANUAL
+}
+
+// ─── Payment ─────────────────────────────────────────────────────────────────
+
+model Payment {
+  id                  String        @id @default(uuid())
+  booking             Booking       @relation(fields: [bookingId], references: [id])
+  bookingId           String        @unique
+  stripeSessionId     String?       @unique
+  stripePaymentIntent String?       @unique
+  amount              Decimal       @db.Decimal(10, 2)
+  currency            String        @default("usd")
+  status              PaymentStatus @default(PENDING)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+// ─── Review ──────────────────────────────────────────────────────────────────
+
+model Review {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  unit      Unit     @relation(fields: [unitId], references: [id])
+  unitId    String
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+  bookingId String   @unique
+  rating    Int
+  content   String
+  featured  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ─── Testimonial ─────────────────────────────────────────────────────────────
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  guestName String
+  location  String?
+  content   String
+  rating    Int?
+  imageUrl  String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── GalleryImage ────────────────────────────────────────────────────────────
+
+model GalleryImage {
+  id        String   @id @default(uuid())
+  url       String
+  caption   String?
+  order     Int      @default(0)
+  unit      Unit?    @relation(fields: [unitId], references: [id])
+  unitId    String?
+  createdAt DateTime @default(now())
+}
