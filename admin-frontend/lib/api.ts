@@ -23,17 +23,24 @@ export interface Unit {
   name: string;
   slug: string;
   type: string;
-  bedrooms: number;
-  bathrooms: number;
+  bedrooms: string;
+  bathrooms: string;
   maxGuests: number;
-  sqft: number | null;
+  sqft: string | null;
   pricePerNight: number;
+  winterRate: number | null;
+  springRate: number | null;
+  summerRate: number | null;
+  fallRate: number | null;
+  activeSeason: string | null;
   cleaningFee: number;
+  petFee: number | null;
+  cancellationHours: number;
   description: string[];
   amenities: string[];
   images: string[];
   icalUrl: string | null;
-  status: 'AVAILABLE' | 'MAINTENANCE' | 'INACTIVE';
+  status: 'AVAILABLE' | 'MAINTENANCE' | 'UNAVAILABLE';
   averageRating: number;
   reviewCount: number;
 }
@@ -44,10 +51,20 @@ export interface Booking {
   checkout: string;
   guests: number;
   status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+  cancelledBy: 'GUEST' | 'ADMIN' | null;
   totalPrice: number;
   createdAt: string;
-  unit?: { id: string; name: string; slug: string; images: string[] };
-  user?: { id: string; email: string; firstName: string | null; lastName: string | null };
+  updatedAt: string;
+  unit?: { id: string; name: string; slug: string };
+  user?: { id: string; name: string; email: string };
+  payment?: {
+    status: string;
+    amount: number;
+    createdAt: string;
+    stripeSessionId: string | null;
+    billingName: string | null;
+    billingEmail: string | null;
+  } | null;
 }
 
 export interface PaginatedBookings {
@@ -156,6 +173,8 @@ export const api = {
     },
     cancel: (id: string, token: string) =>
       request<void>(`/bookings/${id}/cancel`, { method: 'PUT', headers: auth(token) }),
+    adminCancel: (id: string, token: string) =>
+      request<void>(`/bookings/${id}/status`, { method: 'PUT', body: JSON.stringify({ status: 'CANCELLED' }), headers: auth(token) }),
     // Admin refund goes through admin/payments/:id/refund
     refund: (id: string, token: string) =>
       request<void>(`/admin/payments/${id}/refund`, { method: 'POST', headers: auth(token) }),

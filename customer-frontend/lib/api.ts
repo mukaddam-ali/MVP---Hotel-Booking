@@ -1,10 +1,17 @@
-const API = process.env.NEXT_PUBLIC_API_URL ?? '';
+// Server components use localhost for low-latency calls; client uses the public URL
+const API =
+  typeof window === 'undefined'
+    ? (process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? '')
+    : (process.env.NEXT_PUBLIC_API_URL ?? '');
 
 async function request<T>(path: string, options?: RequestInit, token?: string): Promise<T> {
   if (!API) throw new Error('NEXT_PUBLIC_API_URL is not set');
   const headers: HeadersInit = { 'Content-Type': 'application/json', ...options?.headers };
   if (token) (headers as any)['Authorization'] = `Bearer ${token}`;
-  const res = await fetch(`${API}${path}`, { ...options, headers });
+  // Cache public GET requests for 60s; skip caching for auth'd or mutating requests
+  const method = options?.method?.toUpperCase() ?? 'GET';
+  const cacheOpts = method === 'GET' && !token ? { next: { revalidate: 60 } } : {};
+  const res = await fetch(`${API}${path}`, { ...options, headers, ...cacheOpts });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ message: res.statusText }));
     throw new Error(err.message ?? 'Request failed');
@@ -64,6 +71,8 @@ export interface Unit {
   type: string;
   pricePerNight: number;
   cleaningFee: number;
+  petFee: number | null;
+  cancellationHours: number;
   maxGuests: number;
   bedrooms: string;
   bathrooms: string;
@@ -96,9 +105,10 @@ export interface Booking {
   guests: number;
   totalPrice: number;
   status: string;
+  cancelledBy: 'GUEST' | 'ADMIN' | null;
   reviewed: boolean;
   createdAt: string;
-  unit?: { id: string; name: string; slug: string; images: string[] };
+  unit?: { id: string; name: string; slug: string; images: string[]; cancellationHours: number };
 }
 
 export interface BookingDetail extends Booking {

@@ -6,6 +6,7 @@ const UNIT_SUMMARY = {
   name: true,
   slug: true,
   images: true,
+  cancellationHours: true,
 };
 
 @Injectable()
@@ -65,8 +66,9 @@ export class BookingsRepository {
       this.prisma.booking.findMany({
         where,
         include: {
-          unit: { select: { id: true, name: true } },
+          unit: { select: { id: true, name: true, slug: true } },
           user: { select: { id: true, name: true, email: true } },
+          payment: { select: { status: true, amount: true, createdAt: true, stripeSessionId: true, billingName: true, billingEmail: true } },
         },
         orderBy: { createdAt: 'desc' },
         skip: (filters.page - 1) * filters.limit,

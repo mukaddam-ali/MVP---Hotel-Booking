@@ -5,7 +5,7 @@ import { useAuth } from '@clerk/nextjs';
 import Link from 'next/link';
 import { api, Booking } from '@/lib/api';
 import { formatCurrency, formatDate, nightsBetween } from '@/lib/utils';
-import { CalendarDays, Loader2, ChevronRight, XCircle } from 'lucide-react';
+import { CalendarDays, Loader2, ChevronRight, XCircle, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const STATUS_STYLES: Record<string, string> = {
@@ -78,7 +78,11 @@ export default function MyBookingsPage() {
           <div className="space-y-4">
             {bookings.map((b) => {
               const nights = nightsBetween(b.checkin, b.checkout);
-              const canCancel = b.status === 'CONFIRMED' || b.status === 'PENDING';
+              const cancellationHours = b.unit?.cancellationHours ?? 24;
+              const hoursUntilCheckin = (new Date(b.checkin).getTime() - Date.now()) / 36e5;
+              const withinWindow = hoursUntilCheckin < cancellationHours;
+              const canCancel = (b.status === 'CONFIRMED' || b.status === 'PENDING') && !withinWindow;
+              const showNoCancel = (b.status === 'CONFIRMED' || b.status === 'PENDING') && withinWindow;
               return (
                 <div key={b.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                   <div className="flex flex-col sm:flex-row">
@@ -102,7 +106,9 @@ export default function MyBookingsPage() {
                           </div>
                         </div>
                         <span className={cn('text-xs font-semibold px-2.5 py-1 rounded-full border', STATUS_STYLES[b.status])}>
-                          {b.status}
+                          {b.status === 'CANCELLED' && b.cancelledBy === 'ADMIN'
+                            ? 'Cancelled by Property'
+                            : b.status}
                         </span>
                       </div>
 
@@ -121,6 +127,12 @@ export default function MyBookingsPage() {
                               {cancelling === b.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />}
                               Cancel
                             </button>
+                          )}
+                          {showNoCancel && (
+                            <span className="flex items-center gap-1.5 text-xs text-amber-600">
+                              <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+                              Cancellation unavailable — contact property
+                            </span>
                           )}
                           {b.unit?.slug && (
                             <Link href={`/units/${b.unit.slug}`} className="flex items-center gap-1 text-sm text-[#0f2a47] hover:text-[#c9a84c] transition-colors font-medium">

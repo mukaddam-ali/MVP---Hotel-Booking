@@ -19,18 +19,56 @@ export class CreateUnitDto {
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsString()
-  type: string;
+  type?: string;
 
+  // Active nightly rate (derived from season; still accepted directly for compat)
+  @IsOptional()
   @IsNumber()
   @Type(() => Number)
   @Min(0)
-  pricePerNight: number;
+  pricePerNight?: number;
+
+  // Seasonal rates
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  @Min(0)
+  winterRate?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  @Min(0)
+  springRate?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  @Min(0)
+  summerRate?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  @Min(0)
+  fallRate?: number;
+
+  @IsOptional()
+  @IsString()
+  activeSeason?: string;
 
   @IsNumber()
   @Type(() => Number)
   @Min(0)
   cleaningFee: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  @Min(0)
+  petFee?: number;
 
   @IsNumber()
   @Type(() => Number)
@@ -43,8 +81,9 @@ export class CreateUnitDto {
   @IsString()
   bathrooms: string;
 
+  @IsOptional()
   @IsString()
-  sqft: string;
+  sqft?: string;
 
   @IsArray()
   @IsString({ each: true })
@@ -53,6 +92,12 @@ export class CreateUnitDto {
   @IsArray()
   @IsString({ each: true })
   amenities: string[];
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  @Min(1)
+  cancellationHours?: number;
 
   @IsOptional()
   @IsEnum(UnitStatusDto)

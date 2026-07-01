@@ -12,11 +12,11 @@ async function bootstrap() {
     express.raw({ type: 'application/json' }),
   );
 
+  const isDev = process.env.NODE_ENV !== 'production';
   app.enableCors({
-    origin: [
-      process.env.CUSTOMER_FRONTEND_URL,
-      process.env.ADMIN_FRONTEND_URL,
-    ],
+    origin: isDev
+      ? true  // allow all origins in dev
+      : [process.env.CUSTOMER_FRONTEND_URL, process.env.ADMIN_FRONTEND_URL],
     credentials: true,
   });
 

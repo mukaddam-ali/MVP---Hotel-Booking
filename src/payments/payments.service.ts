@@ -101,6 +101,8 @@ export class PaymentsService {
         data: {
           status: 'PAID',
           stripePaymentIntent: session.payment_intent as string,
+          billingName: session.customer_details?.name ?? null,
+          billingEmail: session.customer_details?.email ?? null,
         },
       });
 

@@ -1,13 +1,18 @@
 import { notFound } from 'next/navigation';
 import { api } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
-import { Users, BedDouble, Bath, Maximize2, Star, ChevronLeft } from 'lucide-react';
+import { Users, BedDouble, Bath, Maximize2, Star, ChevronLeft, ShieldCheck } from 'lucide-react';
 import { cloudinaryUrl } from '@/lib/utils';
 import Link from 'next/link';
 import BookingPanel from '@/components/booking/BookingPanel';
 import ReviewsSection from '@/components/reviews/ReviewsSection';
 
 export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const units = await api.units.list().catch(() => []);
+  return units.map((u) => ({ slug: u.slug }));
+}
 
 export default async function UnitDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -118,6 +123,18 @@ export default async function UnitDetailPage({ params }: { params: Promise<{ slu
                   <span className="font-semibold">12% of base rate</span>
                 </div>
               </div>
+            </div>
+
+            {/* Cancellation policy */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <ShieldCheck className="w-5 h-5 text-[#0f2a47]" />
+                <h2 className="text-xl font-bold text-[#0f2a47]">Cancellation Policy</h2>
+              </div>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Free cancellation up to <span className="font-semibold text-[#0f2a47]">{unit.cancellationHours} hours</span> before check-in.
+                After that, cancellation is not available — please contact the property directly for assistance.
+              </p>
             </div>
 
             {/* Reviews */}

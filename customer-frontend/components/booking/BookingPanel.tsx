@@ -39,8 +39,8 @@ export default function BookingPanel({ unit }: Props) {
       try {
         const result = await api.availability.check(unit.id, toDateString(r.from), toDateString(r.to));
         setAvailability(result);
-      } catch {
-        setError('Could not check availability. Please try again.');
+      } catch (e: any) {
+        setError(`Could not check availability: ${e?.message ?? e}`);
       } finally {
         setChecking(false);
       }

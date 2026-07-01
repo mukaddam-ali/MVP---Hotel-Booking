@@ -48,13 +48,30 @@ export class UnitsService {
     return unit;
   }
 
+  private resolveActivePrice(dto: CreateUnitDto | UpdateUnitDto): number | undefined {
+    const map: Record<string, number | undefined> = {
+      winter: dto.winterRate,
+      spring: dto.springRate,
+      summer: dto.summerRate,
+      fall:   dto.fallRate,
+    };
+    if (dto.activeSeason && map[dto.activeSeason] != null) {
+      return map[dto.activeSeason];
+    }
+    return dto.pricePerNight;
+  }
+
   async create(dto: CreateUnitDto) {
     const slug = slugify(dto.name);
     const existing = await this.prisma.unit.findUnique({ where: { slug } });
     if (existing) throw new ConflictException('A unit with this name slug already exists');
+    const pricePerNight = this.resolveActivePrice(dto) ?? 0;
     return this.repo.create({
       ...dto,
+      type: dto.type ?? 'Room',
       slug,
+      pricePerNight,
+      sqft: dto.sqft ?? '',
       description: dto.description,
       amenities: dto.amenities,
       images: [],
@@ -63,7 +80,11 @@ export class UnitsService {
 
   async update(id: string, dto: UpdateUnitDto) {
     await this.getOrFail(id);
-    return this.repo.update(id, dto as any);
+    const pricePerNight = this.resolveActivePrice(dto);
+    return this.repo.update(id, {
+      ...dto as any,
+      ...(pricePerNight != null ? { pricePerNight } : {}),
+    });
   }
 
   async remove(id: string) {

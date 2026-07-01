@@ -80,7 +80,12 @@ export class UnitsRepository {
     return {
       ...rest,
       pricePerNight: Number(rest.pricePerNight),
+      winterRate:  rest.winterRate  != null ? Number(rest.winterRate)  : null,
+      springRate:  rest.springRate  != null ? Number(rest.springRate)  : null,
+      summerRate:  rest.summerRate  != null ? Number(rest.summerRate)  : null,
+      fallRate:    rest.fallRate    != null ? Number(rest.fallRate)    : null,
       cleaningFee: Number(rest.cleaningFee),
+      petFee:      rest.petFee     != null ? Number(rest.petFee)      : null,
       averageRating,
       reviewCount: ratings.length,
     };
